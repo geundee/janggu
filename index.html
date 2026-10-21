@@ -1,655 +1,578 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>수행평가 채점 앱 (40점)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수행평가 채점 40점</title>
 <style>
-:root{--pri:#2f5bd0;--pri-bg:#e8eefc;--bd:#d0d5dd;--fg:#1d2433;--mut:#667085;--bg:#f4f6fa;--card:#fff;
---ok:#1f9d55;--ok-bg:#e3f5ea;--warn:#c77700;--warn-bg:#fff1d6;--bad:#d1342f;--bad-bg:#fde8e7;--gray:#98a2b3;--gray-bg:#eceff3}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:var(--bg);color:var(--fg);font-size:16px}
-button{font:inherit;color:inherit;cursor:pointer}
-.wrap{max-width:900px;margin:0 auto;padding:0 12px 24px}
-.top{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--bd)}
-.top-in{max-width:900px;margin:0 auto;padding:8px 12px 0}
-.top h1{font-size:17px;margin:0 0 6px}
-.tabs{display:flex;gap:4px}
-.tab{flex:1;padding:10px 4px;border:0;background:none;border-bottom:3px solid transparent;font-weight:600;color:var(--mut)}
-.tab.on{color:var(--pri);border-bottom-color:var(--pri)}
-.cnt{display:inline-block;min-width:20px;padding:0 6px;margin-left:4px;border-radius:10px;background:var(--bad);color:#fff;font-size:12px;line-height:20px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
-.chip{padding:8px 12px;border:1px solid var(--bd);background:var(--card);border-radius:8px;font-weight:600;min-width:56px;text-align:center}
-.chip small{display:block;font-weight:400;font-size:11px;color:var(--mut)}
-.chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
-.chip.on small{color:#dbe5ff}
-.sum{font-size:13px;color:var(--mut);margin:4px 0 8px}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Malgun Gothic","맑은 고딕",sans-serif;background:#f5f6f8;color:#222;font-size:15px;padding-bottom:70px}
+header{background:#2c3e50;color:#fff;padding:12px 14px;font-weight:bold;font-size:16px}
+nav{display:flex;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:5}
+nav button{flex:1;padding:12px 4px;border:0;background:none;font-size:15px;cursor:pointer;border-bottom:3px solid transparent}
+nav button.on{border-bottom-color:#2563eb;font-weight:bold;color:#2563eb}
+.badge{color:#dc2626;font-size:12px;margin-left:3px;font-weight:bold}
+main{padding:12px}
+.card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:15px}
+.dim{opacity:.6}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.btn{padding:9px 10px;border:1px solid #bbb;border-radius:6px;background:#fff;cursor:pointer;font-size:14px;color:#222;line-height:1.3}
+.btn.on{background:#2563eb;color:#fff;border-color:#2563eb}
+.btn.red.on{background:#dc2626;border-color:#dc2626}
+.btn.gray.on{background:#6b7280;border-color:#6b7280}
+.btn.green.on{background:#16a34a;border-color:#16a34a}
+.btn.ok{background:#16a34a;color:#fff;border-color:#16a34a}
+.btn.wrong{background:#dc2626;color:#fff;border-color:#dc2626}
+.btn.red{color:#dc2626;border-color:#dc2626}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.sm{padding:7px 8px;font-size:13px;min-width:60px}
+.lbl{font-size:13px;color:#555;margin:8px 0 4px}
+.sum{font-weight:bold;margin:10px 0 2px;font-size:15px}
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-@media(min-width:700px){.grid{grid-template-columns:repeat(10,1fr)}}
-.cell{padding:8px 2px;border:2px solid var(--bd);border-radius:8px;background:var(--card);text-align:center;font-weight:700;line-height:1.2}
-.cell small{display:block;font-size:11px;font-weight:500;min-height:13px}
-.cell.done{background:var(--ok-bg);border-color:#9bd8b4}
-.cell.prog{background:var(--warn-bg);border-color:#f0c673}
-.cell.absent{background:var(--bad-bg);border-color:#f0a9a6;color:var(--bad)}
-.cell.void{background:var(--gray-bg);color:var(--gray);text-decoration:line-through;border-color:var(--gray-bg)}
-.cell.sel{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri)}
-.panel{margin-top:14px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px}
-.phead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.ptitle{font-size:20px;font-weight:800}
-.nav{display:flex;gap:6px}
-.btn{padding:10px 14px;border:1px solid var(--bd);background:var(--card);border-radius:8px;font-weight:600}
-.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
-.btn.bad{color:var(--bad);border-color:#f0a9a6}
-.btn.sm{padding:7px 10px;font-size:14px}
-.seg{display:flex;margin:10px 0}
-.seg button{flex:1;padding:11px 4px;border:1px solid var(--bd);background:var(--card);font-weight:600}
-.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}
-.seg button+button{border-left:0}
-.seg button.on{background:var(--pri);border-color:var(--pri);color:#fff}
-.seg button.on.abs{background:var(--bad);border-color:var(--bad)}
-.seg button.on.vd{background:var(--gray);border-color:var(--gray)}
-.msg{padding:18px;text-align:center;color:var(--mut);background:var(--bg);border-radius:8px}
-.sec{margin-top:14px}
-.sec-h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--fg);padding-bottom:4px;margin-bottom:8px;font-weight:800}
-.sec-h span{font-size:14px;color:var(--pri)}
-.item{margin-bottom:12px}
-.item-t{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
-.item-t em{font-style:normal;color:var(--pri)}
-.opts{display:grid;gap:6px}
-.opts.c3{grid-template-columns:repeat(3,1fr)}
-.opts.c5{grid-template-columns:repeat(5,1fr)}
-.opt{padding:10px 4px;border:2px solid var(--bd);background:var(--card);border-radius:8px;text-align:center;line-height:1.25}
-.opt b{display:block;font-size:17px}
-.opt small{display:block;font-size:12px;color:var(--mut);margin-top:2px}
-.opt.on{border-color:var(--pri);background:var(--pri-bg)}
-.opt.on small{color:var(--fg)}
-.beats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.beat{padding:12px 2px;border:2px solid var(--bd);background:var(--card);border-radius:8px;text-align:center;font-weight:700}
-.beat small{display:block;font-size:12px;font-weight:600;margin-top:2px;min-height:15px}
-.beat.o{background:var(--ok-bg);border-color:var(--ok)}.beat.o small{color:var(--ok)}
-.beat.x{background:var(--bad-bg);border-color:var(--bad)}.beat.x small{color:var(--bad)}
-.hint{font-size:13px;color:var(--mut);margin:6px 0 0}
-.row-tools{display:flex;gap:6px;margin-top:6px}
-.bar{position:sticky;bottom:0;margin:14px -12px -12px;padding:10px 12px;background:var(--fg);color:#fff;border-radius:0 0 10px 10px;display:flex;justify-content:space-around;text-align:center;font-size:13px}
-.bar b{display:block;font-size:20px}
-.bar .t b{color:#ffd666}
-.list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.li{display:flex;align-items:center;gap:8px;padding:10px;background:var(--card);border:1px solid var(--bd);border-radius:8px;flex-wrap:wrap}
-.li .nm{font-weight:800;min-width:80px}
-.li .inf{flex:1;color:var(--mut);font-size:14px;min-width:80px}
-table{width:100%;border-collapse:collapse;background:var(--card);font-size:14px}
-th,td{border:1px solid var(--bd);padding:8px 6px;text-align:center}
-th{background:var(--gray-bg)}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-top:12px}
-.card h3{margin:0 0 8px;font-size:16px}
-.card p{margin:4px 0;font-size:14px;color:var(--mut)}
-.tw{overflow-x:auto}
-#toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:90%}
-#toast.show{opacity:1}
-.warnbox{background:var(--warn-bg);border:1px solid #f0c673;padding:8px 12px;border-radius:8px;font-size:13px;margin-top:10px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.n{padding:10px 0;text-align:center;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:15px}
+.n.done{background:#dcfce7;border-color:#16a34a}
+.n.doing{background:#ffedd5;border-color:#f97316}
+.n.abs{background:#fee2e2;border-color:#dc2626}
+.n.void{background:#e5e7eb;color:#888;text-decoration:line-through}
+.n.sel{outline:3px solid #2563eb}
+.legend{font-size:12px;color:#666;margin-top:8px}
+textarea{width:100%;min-height:60px;font-size:14px;padding:8px;border:1px solid #bbb;border-radius:6px;font-family:inherit;resize:vertical}
+.tb{width:100%;border-collapse:collapse;font-size:14px}
+.tb th,.tb td{border-bottom:1px solid #eee;padding:7px 4px;text-align:right}
+.tb th:first-child,.tb td:first-child{text-align:left}
+.tb tr.tot td{font-weight:bold;border-top:2px solid #999}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#111827;color:#fff;padding:12px 14px;font-size:14px;display:none;z-index:6}
 </style>
 </head>
 <body>
-<div class="top"><div class="top-in"><h1>수행평가 채점 (40점 만점)</h1><div class="tabs" id="tabs"></div></div></div>
-<div class="wrap" id="app"></div>
-<input type="file" id="file" accept=".json,application/json" style="display:none">
-<div id="toast"></div>
+<header>수행평가 채점 (1차 10점 + 2차 30점 = 40점)</header>
+<nav>
+<button data-tab="grade" onclick="setTab('grade')">채점</button>
+<button data-tab="miss" onclick="setTab('miss')">미응시자<span class="badge" id="badgeAbs"></span></button>
+<button data-tab="result" onclick="setTab('result')">결과·엑셀</button>
+</nav>
+<main><div id="view"></div></main>
+<div id="bar"></div>
+<input type="file" id="fileIn" accept=".json,application/json" style="display:none" onchange="restore(this)">
 <script>
-const KEY = 'perf40_v1';
-const NC = 10, NN = 30;
-const BEATS = ['덩', '쿵', '덕', '기덕', '더러러러'];
-let db = {};
-let storageOK = true;
-try {
-  const raw = localStorage.getItem(KEY);
-  if (raw) db = JSON.parse(raw) || {};
-} catch (e) {
-  storageOK = false;
-  db = {};
-}
-function save() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(db));
-  } catch (e) {
-    storageOK = false;
-  }
-}
-const ui = { tab: 'grade', cls: 1, num: 1, mf: 'absent', mc: 0, top: false, focus: false };
+const KEY='score40_v2';
+const JUB=['덩','쿵','덕','기덕','더러러러'];
+const POS=[[5,'악기·손 위치 모두 정확'],[4,'한 가지만 정확'],[3,'모두 부정확']];
+const GU=[[5,'세마치·굿거리 모두 정확'],[4,'한 가지만 정확'],[3,'모두 부정확']];
+const PART=[[5,'발표 2회 이상'],[4,'발표 1회'],[3,'참여 안 함']];
+let data=load();
+let state={tab:'grade',c:1,n:null,mc:0};
 
-function blank() {
-  return { st: 'ok', po: null, be: [null, null, null, null, null], gu: null, se: null, gt: null, pa: null };
+function load(){
+  try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}
 }
-function kk(c, n) { return c + '-' + n; }
-function getS(c, n) {
-  const d = db[kk(c, n)];
-  if (!d) return blank();
-  const s = Object.assign(blank(), d);
-  if (!Array.isArray(s.be) || s.be.length !== 5) s.be = [null, null, null, null, null];
-  return s;
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){alert('브라우저 저장 공간 오류가 났습니다.');}
 }
-function edit(c, n) {
-  const key = kk(c, n);
-  if (!db[key]) db[key] = blank();
-  else db[key] = getS(c, n);
-  return db[key];
+function key(c,n){return c+'-'+n;}
+function blank(){
+  return {void:false,a1:false,a2:false,posture:null,jub:{덩:null,쿵:null,덕:null,기덕:null,더러러러:null},gu:null,sem:null,gur:null,part:null,n1:'',n2:''};
 }
-
-// ---------- 점수 계산 ----------
-function calc(s) {
-  const filled = s.be.every(function (v) { return v !== null; });
-  const wrong = s.be.filter(function (v) { return v === 'x'; }).length;
-  const be = filled ? (wrong === 0 ? 5 : (wrong <= 2 ? 4 : 3)) : null;
-  const se = s.se === null ? null : 10 - s.se;
-  const gt = s.gt === null ? null : 10 - s.gt;
-  const p1 = [s.po, be];
-  const p2 = [s.gu, se, gt, s.pa];
-  const sum = function (a) { return a.reduce(function (x, v) { return x + v; }, 0); };
-  const d1 = p1.every(function (v) { return v !== null; });
-  const d2 = p2.every(function (v) { return v !== null; });
-  const entered = p1.concat(p2).filter(function (v) { return v !== null; }).length;
-  return {
-    po: s.po, be: be, wrong: wrong, filled: filled,
-    gu: s.gu, se: se, gt: gt, pa: s.pa,
-    t1: d1 ? sum(p1) : null,
-    t2: d2 ? sum(p2) : null,
-    total: (d1 && d2) ? sum(p1) + sum(p2) : null,
-    part1: sum(p1.filter(function (v) { return v !== null; })),
-    part2: sum(p2.filter(function (v) { return v !== null; })),
-    entered: entered
-  };
-}
-function stat(s) {
-  if (s.st === 'void') return 'void';
-  if (s.st === 'absent') return 'absent';
-  const r = calc(s);
-  if (r.entered === 6) return 'done';
-  if (r.entered > 0 || s.be.some(function (v) { return v !== null; })) return 'prog';
-  return 'none';
-}
-function classStats(c) {
-  const o = { void: 0, absent: 0, done: 0, prog: 0, none: 0, s1: 0, s2: 0, st: 0 };
-  for (let n = 1; n <= NN; n++) {
-    const s = getS(c, n);
-    const t = stat(s);
-    o[t]++;
-    if (t === 'done') {
-      const r = calc(s);
-      o.s1 += r.t1; o.s2 += r.t2; o.st += r.total;
-    }
-  }
-  o.target = NN - o.void;
-  return o;
-}
-const LABEL = { done: '채점완료', prog: '채점중', none: '미채점', absent: '결석', void: '결번' };
-
-// ---------- 화면 ----------
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show';
-  setTimeout(function () { t.className = ''; }, 1800);
-}
-function opt(a, v, label, sub, on) {
-  return '<button class="opt' + (on ? ' on' : '') + '" data-a="' + a + '" data-v="' + v + '"><b>' + label + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</button>';
-}
-function renderTabs() {
-  let absent = 0;
-  for (let c = 1; c <= NC; c++) for (let n = 1; n <= NN; n++) if (getS(c, n).st === 'absent') absent++;
-  const T = [['grade', '채점'], ['miss', '미응시자'], ['result', '결과·엑셀']];
-  document.getElementById('tabs').innerHTML = T.map(function (t) {
-    return '<button class="tab' + (ui.tab === t[0] ? ' on' : '') + '" data-a="tab" data-v="' + t[0] + '">' + t[1] +
-      (t[0] === 'miss' && absent > 0 ? '<span class="cnt">' + absent + '</span>' : '') + '</button>';
-  }).join('');
-}
-function classChips(withAll, cur, action) {
-  let h = '<div class="chips">';
-  if (withAll) h += '<button class="chip' + (cur === 0 ? ' on' : '') + '" data-a="' + action + '" data-v="0">전체</button>';
-  for (let c = 1; c <= NC; c++) {
-    const st = classStats(c);
-    h += '<button class="chip' + (cur === c ? ' on' : '') + '" data-a="' + action + '" data-v="' + c + '">' + c + '반<small>' + st.done + '/' + st.target + '</small></button>';
-  }
-  return h + '</div>';
-}
-function gradeView() {
-  const c = ui.cls;
-  const st = classStats(c);
-  let h = classChips(false, c, 'cls');
-  h += '<div class="sum">' + c + '반 · 대상 ' + st.target + '명 · 완료 ' + st.done + ' · 채점중 ' + st.prog + ' · 결석 ' + st.absent + ' · 결번 ' + st.void +
-    (st.done ? ' · 평균 ' + (st.st / st.done).toFixed(1) + '점' : '') + '</div>';
-  h += '<div class="grid">';
-  for (let n = 1; n <= NN; n++) {
-    const s = getS(c, n);
-    const t = stat(s);
-    let sub = '';
-    if (t === 'done') sub = calc(s).total + '점';
-    else if (t === 'prog') sub = '채점중';
-    else if (t === 'absent') sub = '결석';
-    else if (t === 'void') sub = '결번';
-    h += '<button class="cell ' + t + (n === ui.num ? ' sel' : '') + '" data-a="num" data-v="' + n + '">' + n + '<small>' + sub + '</small></button>';
-  }
-  h += '</div>';
-  return h + panel();
-}
-function panel() {
-  const c = ui.cls, n = ui.num;
-  const s = getS(c, n);
-  const r = calc(s);
-  let h = '<div class="panel" id="panel"><div class="phead"><div class="ptitle">' + c + '반 ' + n + '번</div>' +
-    '<div class="nav"><button class="btn" data-a="prev">‹ 이전</button><button class="btn pri" data-a="next">다음 ›</button></div></div>';
-  h += '<div class="seg">' +
-    '<button class="' + (s.st === 'ok' ? 'on' : '') + '" data-a="st" data-v="ok">응시</button>' +
-    '<button class="abs ' + (s.st === 'absent' ? 'on' : '') + '" data-a="st" data-v="absent">결석</button>' +
-    '<button class="vd ' + (s.st === 'void' ? 'on' : '') + '" data-a="st" data-v="void">결번</button></div>';
-  if (s.st !== 'ok') {
-    h += '<div class="msg">' + (s.st === 'absent' ? '결석(미응시) 처리된 번호입니다.<br>응시했다면 위에서 &quot;응시&quot;를 누르세요.' : '결번 처리된 번호입니다. 채점 대상에서 제외됩니다.') + '</div></div>';
-    return h;
-  }
-  // 1차
-  h += '<div class="sec"><div class="sec-h">1차 과정평가<span>' + r.part1 + ' / 10점</span></div>';
-  h += '<div class="item"><div class="item-t">자세<em>' + (r.po === null ? '- ' : r.po) + ' / 5</em></div><div class="opts c3">' +
-    opt('po', 5, '5점', '악기·손 위치<br>모두 정확', s.po === 5) +
-    opt('po', 4, '4점', '둘 중<br>한 가지만 정확', s.po === 4) +
-    opt('po', 3, '3점', '모두<br>부정확', s.po === 3) + '</div></div>';
-  h += '<div class="item"><div class="item-t">주법 (눌러서 정확 → 틀림 → 해제)<em>' + (r.be === null ? '- ' : r.be) + ' / 5</em></div><div class="beats">';
-  BEATS.forEach(function (b, i) {
-    const v = s.be[i];
-    h += '<button class="beat ' + (v === 'o' ? 'o' : (v === 'x' ? 'x' : '')) + '" data-a="be" data-v="' + i + '">' + b + '<small>' + (v === 'o' ? '정확' : (v === 'x' ? '틀림' : '-')) + '</small></button>';
-  });
-  h += '</div><div class="row-tools"><button class="btn sm" data-a="beAll">전부 정확</button><button class="btn sm" data-a="beClr">주법 초기화</button></div>';
-  h += '<p class="hint">틀린 ' + r.wrong + '개 · 5개 모두 표시하면 점수 계산 (0개 5점 / 1~2개 4점 / 3~5개 3점)</p></div></div>';
-  // 2차
-  h += '<div class="sec"><div class="sec-h">2차 최종평가<span>' + r.part2 + ' / 30점</span></div>';
-  h += '<div class="item"><div class="item-t">구음<em>' + (r.gu === null ? '- ' : r.gu) + ' / 5</em></div><div class="opts c3">' +
-    opt('gu', 5, '5점', '세마치·굿거리<br>구음 모두 정확', s.gu === 5) +
-    opt('gu', 4, '4점', '둘 중 하나<br>구음 익혀 연주', s.gu === 4) +
-    opt('gu', 3, '3점', '익혀 연주하려고<br>노력', s.gu === 3) + '</div></div>';
-  const SUB = ['오류 없음', '1회 오류', '2회 오류', '3회 오류', '4회 이상'];
-  [['se', '민요장단 (세마치)', r.se], ['gt', '민요장단 (굿거리)', r.gt]].forEach(function (it) {
-    h += '<div class="item"><div class="item-t">' + it[1] + '<em>' + (it[2] === null ? '- ' : it[2]) + ' / 10</em></div><div class="opts c5">';
-    for (let e = 0; e <= 4; e++) h += opt(it[0], e, (10 - e) + '점', SUB[e], s[it[0]] === e);
-    h += '</div></div>';
-  });
-  h += '<div class="item"><div class="item-t">참여도<em>' + (r.pa === null ? '- ' : r.pa) + ' / 5</em></div><div class="opts c3">' +
-    opt('pa', 5, '5점', '연주 발표<br>2회 이상', s.pa === 5) +
-    opt('pa', 4, '4점', '연주 발표<br>1회', s.pa === 4) +
-    opt('pa', 3, '3점', '참여하지<br>않음', s.pa === 3) + '</div></div></div>';
-  h += '<div class="bar"><div>1차<b>' + (r.t1 === null ? r.part1 + '*' : r.t1) + '</b>/10</div><div>2차<b>' + (r.t2 === null ? r.part2 + '*' : r.t2) + '</b>/30</div>' +
-    '<div class="t">총점<b>' + (r.total === null ? '미완료' : r.total) + '</b>/40</div></div></div>';
-  return h;
-}
-function missList() {
-  const out = [];
-  for (let c = 1; c <= NC; c++) {
-    if (ui.mc && ui.mc !== c) continue;
-    for (let n = 1; n <= NN; n++) {
-      const s = getS(c, n);
-      const t = stat(s);
-      if (ui.mf === 'absent' && t === 'absent') out.push([c, n, t, s]);
-      else if (ui.mf === 'todo' && (t === 'none' || t === 'prog')) out.push([c, n, t, s]);
-      else if (ui.mf === 'void' && t === 'void') out.push([c, n, t, s]);
-    }
-  }
-  return out;
-}
-function missView() {
-  const cnt = { absent: 0, todo: 0, void: 0 };
-  for (let c = 1; c <= NC; c++) {
-    if (ui.mc && ui.mc !== c) continue;
-    for (let n = 1; n <= NN; n++) {
-      const t = stat(getS(c, n));
-      if (t === 'absent') cnt.absent++;
-      else if (t === 'void') cnt.void++;
-      else if (t === 'none' || t === 'prog') cnt.todo++;
-    }
-  }
-  let h = classChips(true, ui.mc, 'mc');
-  h += '<div class="seg">' +
-    '<button class="' + (ui.mf === 'absent' ? 'on' : '') + '" data-a="mf" data-v="absent">결석 ' + cnt.absent + '</button>' +
-    '<button class="' + (ui.mf === 'todo' ? 'on' : '') + '" data-a="mf" data-v="todo">채점 미완료 ' + cnt.todo + '</button>' +
-    '<button class="' + (ui.mf === 'void' ? 'on' : '') + '" data-a="mf" data-v="void">결번 ' + cnt.void + '</button></div>';
-  const list = missList();
-  if (!list.length) return h + '<div class="msg">해당하는 학생이 없습니다.</div>';
-  h += '<div class="list">';
-  list.forEach(function (it) {
-    const c = it[0], n = it[1], t = it[2], s = it[3];
-    const key = c + '-' + n;
-    h += '<div class="li"><div class="nm">' + c + '반 ' + n + '번</div>';
-    if (ui.mf === 'todo') {
-      h += '<div class="inf">' + LABEL[t] + ' · ' + calc(s).entered + '/6 항목</div><button class="btn sm pri" data-a="go" data-v="' + key + '">채점하기</button>' +
-        '<button class="btn sm bad" data-a="setabs" data-v="' + key + '">결석 처리</button>';
-    } else {
-      h += '<div class="inf">' + LABEL[t] + '</div>';
-      if (t === 'absent') h += '<button class="btn sm" data-a="go" data-v="' + key + '">채점 화면</button>';
-      h += '<button class="btn sm pri" data-a="setok" data-v="' + key + '">응시로 변경</button>';
-    }
-    h += '</div>';
-  });
-  return h + '</div>';
-}
-function resultView() {
-  let tot = { target: 0, done: 0, absent: 0, void: 0, todo: 0, s1: 0, s2: 0, st: 0 };
-  let rows = '';
-  for (let c = 1; c <= NC; c++) {
-    const s = classStats(c);
-    tot.target += s.target; tot.done += s.done; tot.absent += s.absent; tot.void += s.void; tot.todo += s.prog + s.none;
-    tot.s1 += s.s1; tot.s2 += s.s2; tot.st += s.st;
-    rows += '<tr><td>' + c + '반</td><td>' + s.target + '</td><td>' + s.done + '</td><td>' + (s.prog + s.none) + '</td><td>' + s.absent + '</td><td>' + s.void + '</td><td>' +
-      (s.done ? (s.s1 / s.done).toFixed(1) : '-') + '</td><td>' + (s.done ? (s.s2 / s.done).toFixed(1) : '-') + '</td><td><b>' + (s.done ? (s.st / s.done).toFixed(1) : '-') + '</b></td></tr>';
-  }
-  rows += '<tr><th>전체</th><th>' + tot.target + '</th><th>' + tot.done + '</th><th>' + tot.todo + '</th><th>' + tot.absent + '</th><th>' + tot.void + '</th><th>' +
-    (tot.done ? (tot.s1 / tot.done).toFixed(1) : '-') + '</th><th>' + (tot.done ? (tot.s2 / tot.done).toFixed(1) : '-') + '</th><th>' + (tot.done ? (tot.st / tot.done).toFixed(1) : '-') + '</th></tr>';
-  let h = '<div class="card"><h3>반별 현황</h3><div class="tw"><table><tr><th>반</th><th>대상</th><th>완료</th><th>미완료</th><th>결석</th><th>결번</th><th>1차 평균<br>(10)</th><th>2차 평균<br>(30)</th><th>총점 평균<br>(40)</th></tr>' + rows + '</table></div>' +
-    '<p>평균은 채점이 모두 끝난 학생만으로 계산합니다.</p></div>';
-  h += '<div class="card"><h3>엑셀 내려받기</h3><p>시트 구성: 전체 총점 / 반별요약 / 미응시자 / 1반~10반. 결번은 제외되고, 총점은 6개 항목을 모두 채점한 학생만 계산됩니다.</p>' +
-    '<div class="row-tools"><button class="btn pri" data-a="xlsx">총점 엑셀(.xlsx) 내려받기</button></div>' +
-    (tot.todo ? '<div class="warnbox">아직 채점이 끝나지 않은 학생이 ' + tot.todo + '명 있습니다. 해당 학생의 총점은 빈칸으로 내려받아집니다.</div>' : '') + '</div>';
-  h += '<div class="card"><h3>백업 / 초기화</h3><p>기록은 이 기기의 브라우저에 자동 저장됩니다. 브라우저 데이터를 지우면 사라지니 백업 파일을 따로 보관하세요.</p>' +
-    '<div class="row-tools" style="flex-wrap:wrap"><button class="btn" data-a="backup">백업 저장(.json)</button><button class="btn" data-a="restore">백업 불러오기</button>' +
-    '<button class="btn bad" data-a="resetCls">' + ui.cls + '반 초기화</button><button class="btn bad" data-a="resetAll">전체 초기화</button></div>' +
-    (storageOK ? '' : '<div class="warnbox">이 브라우저에서는 자동 저장을 사용할 수 없습니다. 채점 후 반드시 엑셀이나 백업을 내려받으세요.</div>') + '</div>';
-  return h;
-}
-function render() {
-  const y = window.scrollY;
-  renderTabs();
-  const el = document.getElementById('app');
-  el.innerHTML = ui.tab === 'grade' ? gradeView() : (ui.tab === 'miss' ? missView() : resultView());
-  if (ui.top) {
-    window.scrollTo(0, 0);
-  } else if (ui.focus) {
-    const p = document.getElementById('panel');
-    if (p && p.scrollIntoView) p.scrollIntoView({ block: 'start' });
-    window.scrollBy(0, -80);
-  } else {
-    window.scrollTo(0, y);
-  }
-  ui.top = false;
-  ui.focus = false;
-}
-
-// ---------- 동작 ----------
-function step(d) {
-  let n = ui.num + d;
-  while (n >= 1 && n <= NN) {
-    if (getS(ui.cls, n).st === 'ok') {
-      ui.num = n;
-      ui.focus = true;
-      return;
-    }
-    n += d;
-  }
-  toast(d > 0 ? '마지막 번호입니다.' : '첫 번호입니다.');
-}
-function setStatus(c, n, v) {
-  const s = getS(c, n);
-  if (v !== 'ok' && calc(s).entered > 0 && !confirm(c + '반 ' + n + '번에 입력된 점수가 있습니다. ' + (v === 'absent' ? '결석' : '결번') + ' 처리할까요? (점수는 보관되지만 결과에서 제외됩니다)')) return;
-  edit(c, n).st = v;
-  save();
-}
-function handle(a, v) {
-  const c = ui.cls, n = ui.num;
-  switch (a) {
-    case 'tab': ui.tab = v; ui.top = true; break;
-    case 'cls': ui.cls = +v; ui.num = 1; break;
-    case 'num': ui.num = +v; ui.focus = true; break;
-    case 'prev': step(-1); break;
-    case 'next': step(1); break;
-    case 'st': setStatus(c, n, v); break;
-    case 'po': case 'gu': case 'pa': case 'se': case 'gt': {
-      const s = edit(c, n);
-      const x = +v;
-      s[a] = (s[a] === x) ? null : x;
-      save();
-      break;
-    }
-    case 'be': {
-      const s = edit(c, n);
-      const i = +v;
-      s.be[i] = s.be[i] === null ? 'o' : (s.be[i] === 'o' ? 'x' : null);
-      save();
-      break;
-    }
-    case 'beAll': edit(c, n).be = ['o', 'o', 'o', 'o', 'o']; save(); break;
-    case 'beClr': edit(c, n).be = [null, null, null, null, null]; save(); break;
-    case 'mf': ui.mf = v; break;
-    case 'mc': ui.mc = +v; break;
-    case 'go': {
-      const p = v.split('-');
-      ui.cls = +p[0]; ui.num = +p[1]; ui.tab = 'grade'; ui.top = true;
-      break;
-    }
-    case 'setok': case 'setabs': {
-      const p = v.split('-');
-      setStatus(+p[0], +p[1], a === 'setok' ? 'ok' : 'absent');
-      break;
-    }
-    case 'xlsx': downloadXlsx(); return;
-    case 'backup': downloadBlob(new Blob([JSON.stringify({ app: KEY, data: db })], { type: 'application/json' }), '수행평가_백업_' + today() + '.json'); return;
-    case 'restore': document.getElementById('file').click(); return;
-    case 'resetCls':
-      if (confirm(ui.cls + '반의 모든 채점 기록과 결석/결번 표시를 지울까요?')) {
-        for (let i = 1; i <= NN; i++) delete db[kk(ui.cls, i)];
-        save();
-      }
-      break;
-    case 'resetAll':
-      if (confirm('전체 반의 기록을 모두 지울까요?') && confirm('정말 삭제합니다. 되돌릴 수 없습니다.')) {
-        db = {};
-        save();
-      }
-      break;
-  }
+function get(c,n){return data[key(c,n)]||blank();}
+function put(c,n,s){data[key(c,n)]=s;save();}
+function upd(fn){
+  const s=get(state.c,state.n);
+  fn(s);
+  put(state.c,state.n,s);
   render();
 }
-document.addEventListener('click', function (e) {
-  const el = e.target.closest('[data-a]');
-  if (!el) return;
-  handle(el.getAttribute('data-a'), el.getAttribute('data-v'));
-});
-document.getElementById('file').addEventListener('change', function (e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  const rd = new FileReader();
-  rd.onload = function () {
-    try {
-      const o = JSON.parse(rd.result);
-      if (!o || o.app !== KEY || typeof o.data !== 'object') throw new Error('bad');
-      if (confirm('현재 기록을 지우고 백업 파일의 기록으로 바꿉니다. 계속할까요?')) {
-        db = o.data;
-        save();
-        render();
-        toast('불러왔습니다.');
-      }
-    } catch (err) {
-      alert('올바른 백업 파일이 아닙니다.');
+function h(v){return String(v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function $(id){return document.getElementById(id);}
+
+/* 채점 계산 */
+function jubCalc(s){
+  const vals=JUB.map(function(k){return s.jub[k];});
+  if(vals.some(function(v){return v===null;})) return null;
+  const wrong=vals.filter(function(v){return v==='x';}).length;
+  return wrong===0?5:(wrong<=2?4:3);
+}
+function errScore(e){return e>=4?6:10-e;}
+function p1(s){
+  if(s.a1) return {done:true,total:0,absent:true};
+  const j=jubCalc(s);
+  if(s.posture===null||j===null) return {done:false,total:null};
+  return {done:true,total:s.posture+j,jub:j};
+}
+function p2(s){
+  if(s.a2) return {done:true,total:0,absent:true};
+  if(s.gu===null||s.sem===null||s.gur===null||s.part===null) return {done:false,total:null};
+  const sem=errScore(s.sem), gur=errScore(s.gur);
+  return {done:true,total:s.gu+sem+gur+s.part,sem:sem,gur:gur};
+}
+function summary(s){
+  const a=p1(s), b=p2(s);
+  const done=a.done&&b.done;
+  return {a:a,b:b,done:done,total:done?a.total+b.total:null};
+}
+function status(c,n){
+  const s=get(c,n);
+  if(s.void) return 'void';
+  if(s.a1||s.a2) return 'abs';
+  return summary(s).done?'done':'doing';
+}
+function countAbs(){
+  let k=0;
+  for(let c=1;c<=10;c++) for(let n=1;n<=30;n++){
+    const s=get(c,n);
+    if(!s.void&&(s.a1||s.a2)) k++;
+  }
+  return k;
+}
+function clsStat(c){
+  const q={done:0,doing:0,a1:0,a2:0,void:0,sum:0};
+  for(let n=1;n<=30;n++){
+    const s=get(c,n);
+    if(s.void){q.void++;continue;}
+    if(s.a1) q.a1++;
+    if(s.a2) q.a2++;
+    const st=status(c,n);
+    if(st==='done'){q.done++;q.sum+=summary(s).total;}
+    else if(st==='doing') q.doing++;
+  }
+  return q;
+}
+
+/* 화면 */
+function setTab(t){state.tab=t;render();}
+function render(){
+  document.querySelectorAll('nav button').forEach(function(b){
+    b.classList.toggle('on',b.dataset.tab===state.tab);
+  });
+  const k=countAbs();
+  $('badgeAbs').textContent=k?k:'';
+  if(state.tab==='grade') $('view').innerHTML=viewGrade();
+  else if(state.tab==='miss') $('view').innerHTML=viewMiss();
+  else $('view').innerHTML=viewResult();
+  if(state.tab==='grade'&&state.n){
+    $('bar').style.display='block';
+    $('bar').innerHTML=barHtml();
+  } else {
+    $('bar').style.display='none';
+  }
+}
+function viewGrade(){
+  let x='<div class="card"><h3>반 선택</h3><div class="grid5">';
+  for(let c=1;c<=10;c++){
+    x+=`<button class="btn ${c===state.c?'on':''}" onclick="selClass(${c})">${c}반</button>`;
+  }
+  x+='</div></div>';
+  x+=`<div class="card"><h3>${state.c}반 번호</h3><div class="grid">`;
+  for(let n=1;n<=30;n++){
+    const cls=status(state.c,n);
+    x+=`<div class="n ${cls} ${state.n===n?'sel':''}" onclick="selNo(${n})">${n}</div>`;
+  }
+  x+='</div><div class="legend">초록 채점완료 · 주황 채점중 · 빨강 미응시 · 회색 결번</div></div>';
+  if(!state.n) return x+'<div class="card">번호를 누르면 채점할 수 있습니다.</div>';
+  return x+detail();
+}
+function detail(){
+  const c=state.c, n=state.n, s=get(c,n);
+  let x=`<div class="card" id="detail"><h3>${c}반 ${n}번</h3>`;
+  x+=`<div class="row"><button class="btn gray ${s.void?'on':''}" onclick="toggleVoid()">${s.void?'결번 해제':'결번으로 표시'}</button>`;
+  x+=`<button class="btn" onclick="step(-1)">이전 번호</button><button class="btn" onclick="step(1)">다음 번호</button></div>`;
+  if(s.void) return x+'<div class="lbl">결번이라 채점하지 않습니다.</div></div>';
+  x+=phaseBtns(1,s.a1)+phaseBtns(2,s.a2)+'</div>';
+  return x+sec1(s)+sec2(s);
+}
+function phaseBtns(p,abs){
+  return `<div class="lbl">${p}차 응시 상태</div><div class="row">`+
+    `<button class="btn ${abs?'':'green on'}" onclick="setAbs(${p},false)">응시</button>`+
+    `<button class="btn red ${abs?'on':''}" onclick="setAbs(${p},true)">미응시</button></div>`;
+}
+function sec1(s){
+  const a=p1(s), d=s.a1, dis=d?'disabled':'';
+  let x=`<div class="card ${d?'dim':''}"><h3>1차 과정평가 (10점)</h3>`;
+  if(d) x+='<div class="lbl">미응시 처리되어 1차 점수는 0점입니다.</div>';
+  x+='<div class="lbl">자세 (5점)</div><div class="row">';
+  POS.forEach(function(p){
+    x+=`<button class="btn ${s.posture===p[0]?'on':''}" ${dis} onclick="setField('posture',${p[0]})">${p[0]}점 ${p[1]}</button>`;
+  });
+  x+='</div><div class="lbl">주법 (5점): 누를 때마다 정확 → 틀림 → 미표시</div><div class="row">';
+  JUB.forEach(function(k,i){
+    const v=s.jub[k];
+    const cls=v==='ok'?'ok':(v==='x'?'wrong':'');
+    const t=v==='ok'?'정확':(v==='x'?'틀림':'미표시');
+    x+=`<button class="btn sm ${cls}" ${dis} onclick="cycJ(${i})">${k}<br>${t}</button>`;
+  });
+  const wrong=JUB.filter(function(k){return s.jub[k]==='x';}).length;
+  x+=`</div><div class="row"><button class="btn" ${dis} onclick="allOk()">주법 전부 정확</button><span class="lbl">틀린 개수 ${wrong}개</span></div>`;
+  x+=`<div class="sum">1차 합계: ${d?'미응시 0 / 10':(a.done?a.total+' / 10':'미완료')}</div>`;
+  x+=`<div class="lbl">1차 비고</div><textarea oninput="setNote(1,this.value)" placeholder="1차 필기 내용">${h(s.n1)}</textarea></div>`;
+  return x;
+}
+function errBtns(field,val,dis){
+  let x='<div class="row">';
+  [0,1,2,3,4].forEach(function(e){
+    x+=`<button class="btn ${val===e?'on':''}" ${dis} onclick="setField('${field}',${e})">${e===4?'4회 이상':e+'회'}<br>${errScore(e)}점</button>`;
+  });
+  return x+'</div>';
+}
+function sec2(s){
+  const b=p2(s), d=s.a2, dis=d?'disabled':'';
+  let x=`<div class="card ${d?'dim':''}"><h3>2차 최종평가 (30점)</h3>`;
+  if(d) x+='<div class="lbl">미응시 처리되어 2차 점수는 0점입니다.</div>';
+  x+='<div class="lbl">구음 (5점)</div><div class="row">';
+  GU.forEach(function(p){
+    x+=`<button class="btn ${s.gu===p[0]?'on':''}" ${dis} onclick="setField('gu',${p[0]})">${p[0]}점 ${p[1]}</button>`;
+  });
+  x+='</div><div class="lbl">민요장단 세마치 오류 횟수 (10점 만점)</div>'+errBtns('sem',s.sem,dis);
+  x+='<div class="lbl">민요장단 굿거리 오류 횟수 (10점 만점)</div>'+errBtns('gur',s.gur,dis);
+  x+='<div class="lbl">참여도 (5점)</div><div class="row">';
+  PART.forEach(function(p){
+    x+=`<button class="btn ${s.part===p[0]?'on':''}" ${dis} onclick="setField('part',${p[0]})">${p[0]}점 ${p[1]}</button>`;
+  });
+  x+=`</div><div class="sum">2차 합계: ${d?'미응시 0 / 30':(b.done?b.total+' / 30':'미완료')}</div>`;
+  x+=`<div class="lbl">2차 비고</div><textarea oninput="setNote(2,this.value)" placeholder="2차 필기 내용">${h(s.n2)}</textarea></div>`;
+  return x;
+}
+function barHtml(){
+  const s=get(state.c,state.n);
+  if(s.void) return `${state.c}반 ${state.n}번 · 결번`;
+  const r=summary(s);
+  const t1=s.a1?'미응시':(r.a.done?r.a.total+'/10':'미완료');
+  const t2=s.a2?'미응시':(r.b.done?r.b.total+'/30':'미완료');
+  const tt=r.total===null?'미완료':r.total+'/40';
+  return `${state.c}반 ${state.n}번 &nbsp; 1차 ${t1} · 2차 ${t2} · <b>총점 ${tt}</b>`;
+}
+
+/* 채점 동작 */
+function selClass(c){state.c=c;state.n=null;render();}
+function selNo(n){
+  state.n=n;
+  render();
+  const d=$('detail');
+  if(d) d.scrollIntoView({block:'start'});
+}
+function step(d){
+  let n=state.n+d;
+  while(n>=1&&n<=30){
+    if(!get(state.c,n).void){state.n=n;render();window.scrollTo(0,0);return;}
+    n+=d;
+  }
+  alert(d>0?'마지막 번호입니다.':'첫 번호입니다.');
+}
+function toggleVoid(){upd(function(s){s.void=!s.void;});}
+function setAbs(p,val){upd(function(s){if(p===1)s.a1=val;else s.a2=val;});}
+function setField(f,v){upd(function(s){s[f]=(s[f]===v)?null:v;});}
+function cycJ(i){
+  upd(function(s){
+    const k=JUB[i], v=s.jub[k];
+    s.jub[k]=(v===null)?'ok':(v==='ok'?'x':null);
+  });
+}
+function allOk(){upd(function(s){JUB.forEach(function(k){s.jub[k]='ok';});});}
+function setNote(p,val){
+  const s=get(state.c,state.n);
+  if(p===1) s.n1=val; else s.n2=val;
+  put(state.c,state.n,s);
+}
+
+/* 미응시자 탭 */
+function viewMiss(){
+  let x='<div class="card"><h3>반 선택</h3><div class="grid5">';
+  x+=`<button class="btn ${state.mc===0?'on':''}" onclick="setMc(0)">전체</button>`;
+  for(let c=1;c<=10;c++) x+=`<button class="btn ${state.mc===c?'on':''}" onclick="setMc(${c})">${c}반</button>`;
+  x+='</div></div>';
+  const cls=state.mc===0?[1,2,3,4,5,6,7,8,9,10]:[state.mc];
+  const L1=[],L2=[],LD=[];
+  cls.forEach(function(c){
+    for(let n=1;n<=30;n++){
+      const s=get(c,n);
+      if(s.void) continue;
+      if(s.a1) L1.push([c,n]);
+      if(s.a2) L2.push([c,n]);
+      if(status(c,n)==='doing') LD.push([c,n]);
     }
-    e.target.value = '';
+  });
+  x+=sec('1차 미응시',L1,1);
+  x+=sec('2차 미응시',L2,2);
+  x+=sec('채점 미완료 (미응시 아님)',LD,0);
+  return x;
+}
+function sec(title,list,p){
+  let x=`<div class="card"><h3>${title} (${list.length}명)</h3>`;
+  if(!list.length) return x+'<div class="lbl">해당 학생이 없습니다.</div></div>';
+  list.forEach(function(item){
+    const c=item[0], n=item[1];
+    x+=`<div class="row" style="justify-content:space-between"><span>${c}반 ${n}번</span><span>`;
+    if(p) x+=`<button class="btn sm" onclick="resetAbs(${c},${n},${p})">${p}차 응시로</button> `;
+    x+=`<button class="btn sm" onclick="goGrade(${c},${n})">채점하기</button></span></div>`;
+  });
+  return x+'</div>';
+}
+function resetAbs(c,n,p){
+  const s=get(c,n);
+  if(p===1) s.a1=false; else s.a2=false;
+  put(c,n,s);
+  render();
+}
+function goGrade(c,n){
+  state.tab='grade';state.c=c;state.n=n;
+  render();
+  window.scrollTo(0,0);
+}
+function setMc(v){state.mc=v;render();}
+
+/* 결과 탭 */
+function viewResult(){
+  let x='<div class="card"><h3>반별 현황</h3><table class="tb"><tr><th>반</th><th>완료</th><th>채점중</th><th>1차 미응시</th><th>2차 미응시</th><th>결번</th><th>평균(완료)</th></tr>';
+  const T={done:0,doing:0,a1:0,a2:0,void:0,sum:0};
+  for(let c=1;c<=10;c++){
+    const q=clsStat(c);
+    Object.keys(T).forEach(function(k){T[k]+=q[k];});
+    x+=`<tr><td>${c}반</td><td>${q.done}</td><td>${q.doing}</td><td>${q.a1}</td><td>${q.a2}</td><td>${q.void}</td><td>${q.done?(q.sum/q.done).toFixed(1):'-'}</td></tr>`;
+  }
+  x+=`<tr class="tot"><td>합계</td><td>${T.done}</td><td>${T.doing}</td><td>${T.a1}</td><td>${T.a2}</td><td>${T.void}</td><td>${T.done?(T.sum/T.done).toFixed(1):'-'}</td></tr></table></div>`;
+  x+=`<div class="card"><h3>내려받기 · 백업</h3>
+<div class="row"><button class="btn ok" onclick="dlXlsx()">총점 엑셀(.xlsx) 내려받기</button></div>
+<div class="row"><button class="btn" onclick="backup()">JSON 백업 저장</button><button class="btn" onclick="$('fileIn').click()">JSON 백업 불러오기</button></div>
+<h3 style="margin-top:14px">초기화</h3>
+<div class="row"><button class="btn red" onclick="resetClass()">${state.c}반 기록 초기화</button><button class="btn red" onclick="resetAll()">전체 초기화</button></div>
+<div class="lbl">기록은 이 기기 브라우저에만 저장됩니다. 엑셀이나 JSON 백업을 주기적으로 저장해 두세요.</div></div>`;
+  return x;
+}
+function resetClass(){
+  if(!confirm(state.c+'반 기록을 모두 지울까요?')) return;
+  for(let n=1;n<=30;n++) delete data[key(state.c,n)];
+  save();render();
+}
+function resetAll(){
+  if(!confirm('전체 기록을 모두 지울까요? 되돌릴 수 없습니다.')) return;
+  data={};save();render();
+}
+function backup(){
+  download(new Blob([JSON.stringify(data)],{type:'application/json'}),'score40_백업_'+today()+'.json');
+}
+function restore(input){
+  const f=input.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=function(){
+    try{
+      const d=JSON.parse(r.result);
+      if(!confirm('현재 기록을 백업 파일 내용으로 바꿉니다. 계속할까요?')) return;
+      data=d;save();render();
+    }catch(e){alert('백업 파일을 읽을 수 없습니다.');}
   };
-  rd.readAsText(f);
-});
-
-// ---------- 엑셀(.xlsx) 생성 (외부 라이브러리 없음) ----------
-function today() {
-  const d = new Date();
-  const p = function (x) { return (x < 10 ? '0' : '') + x; };
-  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
+  r.readAsText(f);
+  input.value='';
 }
-function esc(t) {
-  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function today(){
+  const d=new Date();
+  return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
 }
-function colName(i) {
-  let s = '';
-  i++;
-  while (i > 0) {
-    const m = (i - 1) % 26;
-    s = String.fromCharCode(65 + m) + s;
-    i = Math.floor((i - 1) / 26);
-  }
-  return s;
-}
-const HEAD = ['반', '번호', '상태', '자세(5)', '주법(5)', '주법 틀린 항목', '1차 합계(10)', '구음(5)', '세마치(10)', '굿거리(10)', '참여도(5)', '2차 합계(30)', '총점(40)', '비고'];
-const WID = [6, 7, 11, 10, 10, 18, 13, 9, 11, 11, 11, 13, 11, 22];
-function rowFor(c, n) {
-  const s = getS(c, n);
-  const t = stat(s);
-  const r = calc(s);
-  const ab = (t === 'absent');
-  const wn = (r.filled && !ab) ? (s.be.map(function (v, i) { return v === 'x' ? BEATS[i] : null; }).filter(Boolean).join(', ') || '없음') : null;
-  let note = null;
-  if (ab) note = '결석(미응시)';
-  else if (t === 'prog') note = (6 - r.entered) + '개 항목 미입력';
-  else if (t === 'none') note = '미채점';
-  const z = function (v) { return ab ? null : v; };
-  return [c, n, LABEL[t], z(r.po), z(r.be), wn, z(r.t1), z(r.gu), z(r.se), z(r.gt), z(r.pa), z(r.t2), z(r.total), note];
-}
-function sheetXml(header, rows, widths, first) {
-  let x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
-    '<sheetViews><sheetView workbookViewId="0"' + (first ? ' tabSelected="1"' : '') + '><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
-    '<sheetFormatPr defaultRowHeight="18"/><cols>';
-  widths.forEach(function (w, i) {
-    x += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
-  });
-  x += '</cols><sheetData>';
-  const all = [header.map(function (h) { return { v: h, s: 1 }; })].concat(rows);
-  all.forEach(function (row, ri) {
-    x += '<row r="' + (ri + 1) + '">';
-    row.forEach(function (cell, ci) {
-      const ref = colName(ci) + (ri + 1);
-      let v = cell, s = 2;
-      if (cell !== null && typeof cell === 'object') { v = cell.v; s = cell.s; }
-      if (v === null || v === undefined || v === '') x += '<c r="' + ref + '" s="' + s + '"/>';
-      else if (typeof v === 'number') x += '<c r="' + ref + '" s="' + s + '"><v>' + v + '</v></c>';
-      else x += '<c r="' + ref + '" s="' + s + '" t="inlineStr"><is><t>' + esc(v) + '</t></is></c>';
-    });
-    x += '</row>';
-  });
-  return x + '</sheetData></worksheet>';
-}
-const STYLES = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
-  '<fonts count="2"><font><sz val="11"/><name val="맑은 고딕"/></font><font><b/><sz val="11"/><name val="맑은 고딕"/></font></fonts>' +
-  '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD9E2F3"/><bgColor indexed="64"/></patternFill></fill></fills>' +
-  '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border></borders>' +
-  '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-  '<cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
-  '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>' +
-  '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>' +
-  '<xf numFmtId="2" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf></cellXfs>' +
-  '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
-
-function buildSheets() {
-  const sheets = [];
-  const all = [];
-  for (let c = 1; c <= NC; c++) for (let n = 1; n <= NN; n++) if (getS(c, n).st !== 'void') all.push(rowFor(c, n));
-  sheets.push({ name: '전체 총점', head: HEAD, rows: all, w: WID });
-  // 반별 요약
-  const sumRows = [];
-  const T = { target: 0, done: 0, todo: 0, absent: 0, void: 0, s1: 0, s2: 0, st: 0 };
-  for (let c = 1; c <= NC; c++) {
-    const s = classStats(c);
-    T.target += s.target; T.done += s.done; T.todo += s.prog + s.none; T.absent += s.absent; T.void += s.void; T.s1 += s.s1; T.s2 += s.s2; T.st += s.st;
-    sumRows.push([c + '반', s.target, s.done, s.prog + s.none, s.absent, s.void,
-      s.done ? { v: s.s1 / s.done, s: 3 } : null, s.done ? { v: s.s2 / s.done, s: 3 } : null, s.done ? { v: s.st / s.done, s: 3 } : null]);
-  }
-  sumRows.push(['전체', T.target, T.done, T.todo, T.absent, T.void,
-    T.done ? { v: T.s1 / T.done, s: 3 } : null, T.done ? { v: T.s2 / T.done, s: 3 } : null, T.done ? { v: T.st / T.done, s: 3 } : null]);
-  sheets.push({ name: '반별요약', head: ['반', '대상 인원', '채점완료', '미완료', '결석', '결번', '1차 평균(10)', '2차 평균(30)', '총점 평균(40)'], rows: sumRows, w: [8, 11, 11, 10, 8, 8, 14, 14, 14] });
-  // 미응시자
-  const miss = [];
-  for (let c = 1; c <= NC; c++) {
-    for (let n = 1; n <= NN; n++) {
-      const s = getS(c, n);
-      const t = stat(s);
-      if (t === 'absent') miss.push([c, n, '결석', '']);
-      else if (t === 'prog') miss.push([c, n, '채점중', (6 - calc(s).entered) + '개 항목 미입력']);
-      else if (t === 'none') miss.push([c, n, '미채점', '']);
-    }
-  }
-  sheets.push({ name: '미응시자', head: ['반', '번호', '구분', '비고'], rows: miss, w: [6, 7, 11, 20] });
-  for (let c = 1; c <= NC; c++) {
-    const rows = [];
-    for (let n = 1; n <= NN; n++) if (getS(c, n).st !== 'void') rows.push(rowFor(c, n));
-    sheets.push({ name: c + '반', head: HEAD, rows: rows, w: WID });
-  }
-  return sheets;
-}
-let CRC_T = null;
-function crc32(b) {
-  if (!CRC_T) {
-    CRC_T = [];
-    for (let i = 0; i < 256; i++) {
-      let c = i;
-      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-      CRC_T[i] = c >>> 0;
-    }
-  }
-  let crc = 0xFFFFFFFF;
-  for (let i = 0; i < b.length; i++) crc = CRC_T[(crc ^ b[i]) & 255] ^ (crc >>> 8);
-  return (crc ^ 0xFFFFFFFF) >>> 0;
-}
-function le(n, bytes) {
-  const a = [];
-  for (let i = 0; i < bytes; i++) a.push((n >>> (8 * i)) & 255);
-  return a;
-}
-function zipStore(files) {
-  const enc = new TextEncoder();
-  const parts = [];
-  const central = [];
-  let offset = 0;
-  files.forEach(function (f) {
-    const nm = enc.encode(f.name);
-    const data = enc.encode(f.text);
-    const crc = crc32(data);
-    const local = [].concat(le(0x04034b50, 4), le(20, 2), le(0x0800, 2), le(0, 2), le(0, 2), le(33, 2), le(crc, 4), le(data.length, 4), le(data.length, 4), le(nm.length, 2), le(0, 2));
-    parts.push(new Uint8Array(local), nm, data);
-    const cen = [].concat(le(0x02014b50, 4), le(20, 2), le(20, 2), le(0x0800, 2), le(0, 2), le(0, 2), le(33, 2), le(crc, 4), le(data.length, 4), le(data.length, 4), le(nm.length, 2), le(0, 2), le(0, 2), le(0, 2), le(0, 2), le(0, 4), le(offset, 4));
-    central.push(new Uint8Array(cen), nm);
-    offset += local.length + nm.length + data.length;
-  });
-  let csize = 0;
-  central.forEach(function (c) { csize += c.length; });
-  const end = new Uint8Array([].concat(le(0x06054b50, 4), le(0, 2), le(0, 2), le(files.length, 2), le(files.length, 2), le(csize, 4), le(offset, 4), le(0, 2)));
-  const all = parts.concat(central, [end]);
-  let total = 0;
-  all.forEach(function (p) { total += p.length; });
-  const out = new Uint8Array(total);
-  let pos = 0;
-  all.forEach(function (p) { out.set(p, pos); pos += p.length; });
-  return out;
-}
-function buildXlsx() {
-  const sheets = buildSheets();
-  const files = [];
-  files.push({ name: '[Content_Types].xml', text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
-    sheets.map(function (s, i) { return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('') + '</Types>' });
-  files.push({ name: '_rels/.rels', text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' });
-  files.push({ name: 'xl/workbook.xml', text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' +
-    sheets.map(function (s, i) { return '<sheet name="' + esc(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>'; }).join('') + '</sheets></workbook>' });
-  files.push({ name: 'xl/_rels/workbook.xml.rels', text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-    sheets.map(function (s, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>'; }).join('') +
-    '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' });
-  files.push({ name: 'xl/styles.xml', text: STYLES });
-  sheets.forEach(function (s, i) {
-    files.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', text: sheetXml(s.head, s.rows, s.w, i === 0) });
-  });
-  return zipStore(files);
-}
-function downloadBlob(blob, name) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
+function download(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
   document.body.appendChild(a);
   a.click();
-  setTimeout(function () {
-    URL.revokeObjectURL(a.href);
-    a.remove();
-  }, 1000);
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
 }
-function downloadXlsx() {
-  const bytes = buildXlsx();
-  downloadBlob(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), '수행평가_총점_' + today() + '.xlsx');
-  toast('엑셀 파일을 만들었습니다.');
+
+/* 엑셀 생성 (외부 라이브러리 없이 직접 작성) */
+function eachStu(fn){
+  for(let c=1;c<=10;c++) for(let n=1;n<=30;n++){
+    const s=get(c,n);
+    if(s.void) continue;
+    fn(c,n,s,summary(s));
+  }
 }
+function stLabel(abs,done){return abs?'미응시':(done?'채점완료':'미완료');}
+function errLabel(e){return e===null||e===undefined?'':(e>=4?'4회 이상':e+'회');}
+function sheetTotal(){
+  const rows=[['반','번호','1차 상태','2차 상태','1차 점수(10)','2차 점수(30)','총점(40)','1차 비고','2차 비고','채점상태']];
+  eachStu(function(c,n,s,r){
+    rows.push([c,n,stLabel(s.a1,r.a.done),stLabel(s.a2,r.b.done),
+      r.a.done?r.a.total:'',r.b.done?r.b.total:'',r.total===null?'':r.total,
+      s.n1,s.n2,r.done?'완료':'채점중']);
+  });
+  return {name:'전체 총점',rows:rows,widths:[6,8,12,12,14,14,12,30,30,12]};
+}
+function sheetSummary(){
+  const rows=[['반','완료','채점중','1차 미응시','2차 미응시','결번','평균 총점(완료자)']];
+  const T={done:0,doing:0,a1:0,a2:0,void:0,sum:0};
+  for(let c=1;c<=10;c++){
+    const q=clsStat(c);
+    Object.keys(T).forEach(function(k){T[k]+=q[k];});
+    rows.push([c+'반',q.done,q.doing,q.a1,q.a2,q.void,q.done?Number((q.sum/q.done).toFixed(1)):'']);
+  }
+  rows.push(['전체',T.done,T.doing,T.a1,T.a2,T.void,T.done?Number((T.sum/T.done).toFixed(1)):'']);
+  return {name:'반별요약',rows:rows,widths:[8,10,10,12,12,10,16]};
+}
+function sheetMiss(){
+  const rows=[['반','번호','구분','1차 비고','2차 비고']];
+  eachStu(function(c,n,s,r){
+    let g='';
+    if(s.a1&&s.a2) g='1차·2차 미응시';
+    else if(s.a1) g='1차 미응시';
+    else if(s.a2) g='2차 미응시';
+    else if(!r.done) g='채점 미완료';
+    if(g) rows.push([c,n,g,s.n1,s.n2]);
+  });
+  return {name:'미응시자',rows:rows,widths:[6,8,16,30,30]};
+}
+function sheetClass(c){
+  const rows=[['번호','1차 상태','자세(5)','주법 틀린 항목','주법(5)','1차 점수(10)','1차 비고',
+    '2차 상태','구음(5)','세마치 오류','세마치(10)','굿거리 오류','굿거리(10)','참여도(5)','2차 점수(30)','2차 비고','총점(40)','채점상태']];
+  for(let n=1;n<=30;n++){
+    const s=get(c,n);
+    if(s.void) continue;
+    const r=summary(s), a=r.a, b=r.b;
+    let wrongList='';
+    if(!s.a1 && a.jub!==undefined){
+      const w=JUB.filter(function(k){return s.jub[k]==='x';});
+      wrongList=w.length?w.join(', '):'없음';
+    }
+    rows.push([n,stLabel(s.a1,a.done),
+      s.a1?'':(s.posture===null?'':s.posture),
+      wrongList,
+      s.a1?'':(a.jub===undefined?'':a.jub),
+      a.done?a.total:'',s.n1,
+      stLabel(s.a2,b.done),
+      s.a2?'':(s.gu===null?'':s.gu),
+      s.a2?'':errLabel(s.sem),
+      b.sem===undefined?'':b.sem,
+      s.a2?'':errLabel(s.gur),
+      b.gur===undefined?'':b.gur,
+      s.a2?'':(s.part===null?'':s.part),
+      b.done?b.total:'',s.n2,
+      r.total===null?'':r.total,
+      r.done?'완료':'채점중']);
+  }
+  return {name:c+'반',rows:rows,widths:[8,12,10,20,10,12,30,12,10,12,12,12,12,12,14,30,12,12]};
+}
+function dlXlsx(){
+  const sheets=[sheetTotal(),sheetSummary(),sheetMiss()];
+  for(let c=1;c<=10;c++) sheets.push(sheetClass(c));
+  const bytes=buildXlsx(sheets);
+  download(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'수행평가_총점_'+today()+'.xlsx');
+}
+function colName(i){
+  let s='';i++;
+  while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}
+  return s;
+}
+function xmlEsc(v){
+  return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c];});
+}
+function sheetXml(rows,widths){
+  let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+  x+='<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>';
+  x+='<cols>';
+  widths.forEach(function(w,i){x+=`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`;});
+  x+='</cols><sheetData>';
+  rows.forEach(function(row,r){
+    x+=`<row r="${r+1}">`;
+    row.forEach(function(v,c){
+      if(v===null||v===undefined||v==='') return;
+      const ref=colName(c)+(r+1);
+      const st=r===0?' s="1"':'';
+      if(typeof v==='number') x+=`<c r="${ref}"${st}><v>${v}</v></c>`;
+      else x+=`<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${xmlEsc(v)}</t></is></c>`;
+    });
+    x+='</row>';
+  });
+  return x+'</sheetData></worksheet>';
+}
+const STYLES='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+'<fonts count="2"><font><sz val="11"/><name val="맑은 고딕"/></font><font><b/><sz val="11"/><name val="맑은 고딕"/></font></fonts>'+
+'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'+
+'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'+
+'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'+
+'<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>'+
+'</styleSheet>';
+function buildXlsx(sheets){
+  const enc=new TextEncoder();
+  const hd='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  let ct=hd+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>';
+  sheets.forEach(function(s,i){
+    ct+=`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`;
+  });
+  ct+='</Types>';
+  const rels=hd+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  let wb=hd+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>';
+  sheets.forEach(function(s,i){wb+=`<sheet name="${xmlEsc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`;});
+  wb+='</sheets></workbook>';
+  let wr=hd+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+  sheets.forEach(function(s,i){
+    wr+=`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`;
+  });
+  wr+=`<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+  const files=[
+    {name:'[Content_Types].xml',data:enc.encode(ct)},
+    {name:'_rels/.rels',data:enc.encode(rels)},
+    {name:'xl/workbook.xml',data:enc.encode(wb)},
+    {name:'xl/_rels/workbook.xml.rels',data:enc.encode(wr)},
+    {name:'xl/styles.xml',data:enc.encode(STYLES)}
+  ];
+  sheets.forEach(function(s,i){
+    files.push({name:`xl/worksheets/sheet${i+1}.xml`,data:enc.encode(sheetXml(s.rows,s.widths))});
+  });
+  return makeZip(files);
+}
+const CRC_T=(function(){
+  const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c=n;
+    for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+    t[n]=c>>>0;
+  }
+  return t;
+})();
+function crc32(b){
+  let c=0xFFFFFFFF;
+  for(let i=0;i<b.length;i++) c=CRC_T[(c^b[i])&255]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0;
+}
+function makeZip(files){
+  const enc=new TextEncoder();
+  const now=new Date();
+  const dosTime=(now.getHours()<<11)|(now.getMinutes()<<5)|Math.floor(now.getSeconds()/2);
+  const dosDate=((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate();
+  const chunks=[], central=[];
+  let offset=0;
+  files.forEach(function(f){
+    const nameB=enc.encode(f.name);
+    const crc=crc32(f.data), size=f.data.length;
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true);
+    lh.setUint16(8,0,true); lh.setUint16(10,dosTime,true); lh.setUint16(12,dosDate,true);
+    lh.setUint32(14,crc,true); lh.setUint32(18,size,true); lh.setUint32(22,size,true);
+    lh.setUint16(26,nameB.length,true); lh.setUint16(28,0,true);
+    chunks.push(new Uint8Array(lh.buffer),nameB,f.data);
+    const cd=new DataView(new ArrayBuffer(46));
+    cd.setUint32(0,0x02014b50,true); cd.setUint16(4,20,true); cd.setUint16(6,20,true);
+    cd.setUint16(8,0x0800,true); cd.setUint16(10,0,true); cd.setUint16(12,dosTime,true);
+    cd.setUint16(14,dosDate,true); cd.setUint32(16,crc,true); cd.setUint32(20,size,true);
+    cd.setUint32(24,size,true); cd.setUint16(28,nameB.length,true); cd.setUint16(30,0,true);
+    cd.setUint16(32,0,true); cd.setUint16(34,0,true); cd.setUint16(36,0,true);
+    cd.setUint32(38,0,true); cd.setUint32(42,offset,true);
+    central.push(new Uint8Array(cd.buffer),nameB);
+    offset+=30+nameB.length+size;
+  });
+  let cdSize=0;
+  central.forEach(function(b){cdSize+=b.length;});
+  const end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true); end.setUint16(4,0,true); end.setUint16(6,0,true);
+  end.setUint16(8,files.length,true); end.setUint16(10,files.length,true);
+  end.setUint32(12,cdSize,true); end.setUint32(16,offset,true); end.setUint16(20,0,true);
+  const all=chunks.concat(central,[new Uint8Array(end.buffer)]);
+  let total=0;
+  all.forEach(function(b){total+=b.length;});
+  const out=new Uint8Array(total);
+  let p=0;
+  all.forEach(function(b){out.set(b,p);p+=b.length;});
+  return out;
+}
+
 render();
 </script>
 </body>
